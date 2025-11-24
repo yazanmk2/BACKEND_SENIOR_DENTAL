@@ -19,6 +19,7 @@ class User extends Authenticatable
         'address',
         'gender',
         'type',
+        'photo',
     ];
 
     public function customer()

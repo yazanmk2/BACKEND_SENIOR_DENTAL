@@ -12,120 +12,152 @@ use App\Models\Booking;
 use App\Models\DisplayCase;
 use App\Models\ApplicationRateFeedback;
 use App\Models\DoctorRateFeedback;
+use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ========== USERS ==========
-        $userCustomer = User::create([
-            'first_name' => 'Yazan2',
-            'father_name' => 'Ahmad',
-            'last_name' => 'Ali',
-            'phone' => '0994999999',
-            'email' => 'yazan1@example.com',
-            'password' => bcrypt('123456'),
-            'address' => 'Damascus',
-            'gender' => 'male',
-            'type' => 'customer',
-        ]);
+        $faker = Faker::create();
 
-        $userDoctor = User::create([
-            'first_name' => 'Dr. Lina2',
-            'father_name' => 'Omar',
-            'last_name' => 'Hassan',
-            'phone' => '0988688888',
-            'email' => 'doctor2@example.com',
-            'password' => bcrypt('123456'),
-            'address' => 'Aleppo',
-            'gender' => 'female',
-            'type' => 'doctor',
-        ]);
+        // ---------- USERS ----------
+        $users = collect();
 
-        $userAdmin = User::create([
-            'first_name' => 'Sara2',
-            'father_name' => 'Maher',
-            'last_name' => 'Khaled',
-            'phone' => '0977577777',
-            'email' => 'admin2@example.com',
-            'password' => bcrypt('admin123'),
-            'address' => 'Homs',
-            'gender' => 'female',
-            'type' => 'admin',
-        ]);
+        // Create customers
+        for ($i = 0; $i < 30; $i++) {
+            $users->push(User::create([
+                'first_name' => $faker->firstName,
+                'father_name' => $faker->firstName,
+                'last_name' => $faker->lastName,
+                'phone' => $faker->unique()->phoneNumber,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('123456'),
+                'address' => $faker->address,
+                'gender' => $faker->randomElement(['male', 'female']),
+                'type' => 'customer',
+            ]));
+        }
 
-        // ========== ROLE TABLES ==========
-        $customer = Customer::create([
-            'u_id' => $userCustomer->id,
-            'birthdate' => '1995-04-20',
-        ]);
+        // Create doctors
+        for ($i = 0; $i < 10; $i++) {
+            $users->push(User::create([
+                'first_name' => $faker->firstName,
+                'father_name' => $faker->firstName,
+                'last_name' => $faker->lastName,
+                'phone' => $faker->unique()->phoneNumber,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('123456'),
+                'address' => $faker->address,
+                'gender' => $faker->randomElement(['male', 'female']),
+                'type' => 'doctor',
+            ]));
+        }
 
-        $doctor = Doctor::create([
-            'u_id' => $userDoctor->id,
-            'cv' => 'Experienced dentist specializing in orthodontics.',
-            'specialization' => 'Dentistry',
-            'previous_works' => 'Worked at Smile Clinic, Aleppo.',
-            'open_time' => '09:00:00',
-            'close_time' => '17:00:00',
-        ]);
+        // Create admins
+        for ($i = 0; $i < 3; $i++) {
+            $users->push(User::create([
+                'first_name' => $faker->firstName,
+                'father_name' => $faker->firstName,
+                'last_name' => $faker->lastName,
+                'phone' => $faker->unique()->phoneNumber,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('admin123'),
+                'address' => $faker->address,
+                'gender' => $faker->randomElement(['male', 'female']),
+                'type' => 'admin',
+            ]));
+        }
 
-        $admin = Admin::create([
-            'u_id' => $userAdmin->id,
-        ]);
+        // Create HR
+        for ($i = 0; $i < 2; $i++) {
+            $users->push(User::create([
+                'first_name' => $faker->firstName,
+                'father_name' => $faker->firstName,
+                'last_name' => $faker->lastName,
+                'phone' => $faker->unique()->phoneNumber,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('hr123'),
+                'address' => $faker->address,
+                'gender' => $faker->randomElement(['male', 'female']),
+                'type' => 'hr',
+            ]));
+        }
 
-        // ========== BOOKINGS ==========
-        Booking::create([
-            'c_id' => $customer->id,
-            'd_id' => $doctor->id,
-            'time' => '10:30:00',
-            'date' => '2025-11-10',
-            'note' => 'First-time consultation and check-up.',
-            'status' => 'confirmed',
-        ]);
+        // ---------- CUSTOMERS ----------
+        $customers = collect();
+        foreach (User::where('type', 'customer')->get() as $user) {
+            $customers->push(Customer::create([
+                'u_id' => $user->id,
+                'birthdate' => $faker->date(),
+                'patient_record' => 'patient_records/patient_record_' . $user->first_name . '_' . $user->last_name . '.pdf',
+            ]));
+        }
 
-        Booking::create([
-            'c_id' => $customer->id,
-            'd_id' => $doctor->id,
-            'time' => '14:00:00',
-            'date' => '2025-11-15',
-            'note' => 'Teeth whitening session.',
-            'status' => 'pending',
-        ]);
+        // ---------- DOCTORS ----------
+        $doctors = collect();
+        foreach (User::where('type', 'doctor')->get() as $user) {
+            $doctors->push(Doctor::create([
+                'u_id' => $user->id,
+                'cv' => $faker->sentence(8),
+                'specialization' => $faker->randomElement(['Orthodontics', 'Implantology', 'Endodontics', 'Surgery']),
+                'previous_works' => $faker->sentence(12),
+                'open_time' => '09:00:00',
+                'close_time' => '17:00:00',
+            ]));
+        }
 
-        // ========== DISPLAY CASES ==========
-        DisplayCase::create([
-            'd_id' => $doctor->id,
-            'photo_before' => 'before_case1.jpg',
-            'photo_after' => 'after_case1.jpg',
-            'favorite_flag' => true,
-        ]);
+        // ---------- ADMINS ----------
+        foreach (User::where('type', 'admin')->get() as $user) {
+            Admin::create(['u_id' => $user->id]);
+        }
 
-        DisplayCase::create([
-            'd_id' => $doctor->id,
-            'photo_before' => 'before_case2.jpg',
-            'photo_after' => 'after_case2.jpg',
-            'favorite_flag' => false,
-        ]);
+        // ---------- HR ----------
+        foreach (User::where('type', 'hr')->get() as $user) {
+            HR::create(['u_id' => $user->id]);
+        }
 
-        // ========== FEEDBACKS ==========
-        ApplicationRateFeedback::create([
-            'u_id' => $userCustomer->id,
-            'rate' => 5,
-            'feedback' => 'Very user-friendly app and excellent experience!',
-        ]);
+        // ---------- BOOKINGS ----------
+        for ($i = 0; $i < 50; $i++) {
+            Booking::create([
+                'c_id' => $customers->random()->id,
+                'd_id' => $doctors->random()->id,
+                'time' => $faker->time(),
+                'date' => $faker->date(),
+                'note' => $faker->sentence(),
+                'status' => $faker->randomElement(['pending', 'confirmed', 'completed']),
+            ]);
+        }
 
-        DoctorRateFeedback::create([
-            'c_id' => $customer->id,
-            'd_id' => $doctor->id,
-            'rate' => 4,
-            'feedback' => 'Professional and kind doctor. Highly recommended!',
-        ]);
+        // ---------- DISPLAY CASES ----------
+        for ($i = 0; $i < 20; $i++) {
+            DisplayCase::create([
+                'd_id' => $doctors->random()->id,
+                'photo_before' => 'before_case_' . $i . '.jpg',
+                'photo_after' => 'after_case_' . $i . '.jpg',
+                'favorite_flag' => $faker->boolean(),
+            ]);
+        }
 
-        DoctorRateFeedback::create([
-            'c_id' => $customer->id,
-            'd_id' => $doctor->id,
-            'rate' => 5,
-            'feedback' => 'Best dental experience I’ve had so far!',
-        ]);
+        // ---------- APPLICATION FEEDBACKS ----------
+        for ($i = 0; $i < 40; $i++) {
+            ApplicationRateFeedback::create([
+                'u_id' => $users->random()->id,
+                'rate' => $faker->numberBetween(1, 5),
+                'feedback' => $faker->sentence(8),
+            ]);
+        }
+
+        // ---------- DOCTOR FEEDBACKS ----------
+        for ($i = 0; $i < 40; $i++) {
+            DoctorRateFeedback::create([
+                'c_id' => $customers->random()->id,
+                'd_id' => $doctors->random()->id,
+                'rate' => $faker->numberBetween(1, 5),
+                'feedback' => $faker->sentence(8),
+            ]);
+        }
+
+        echo "✅ Database seeded successfully with large fake data!\n";
     }
 }

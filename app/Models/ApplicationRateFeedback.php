@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +9,7 @@ class ApplicationRateFeedback extends Model
 {
     use HasFactory;
 
-    protected $table = 'application_rates_feedbacks'; // ✅ Explicitly match table name
+    protected $table = 'application_rates_feedbacks';
 
     protected $fillable = [
         'u_id',

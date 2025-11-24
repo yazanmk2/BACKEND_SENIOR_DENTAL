@@ -15,7 +15,7 @@ class CustomerInfoRequest extends FormRequest
     {
         return [
             'birthdate' => 'required|date',
-            'patient_record' => 'nullable|file|mimes:pdf|max:2048', // 2 MB max
+            'patient_record' => 'nullable|file|mimes:pdf|max:4096', // 2 MB max
             'patient_record_text' => 'nullable|string',
         ];
     }

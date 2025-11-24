@@ -6,5 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    //
+    public function doctor()
+{
+    return $this->belongsTo(Doctor::class, 'd_id');
+}
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'c_id');
+    }
+    public function user()
+{
+    return $this->belongsTo(User::class, 'u_id');
+}
+
+
 }

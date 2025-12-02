@@ -8,44 +8,52 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateBookingService
 {
-    public function create($data)
+    public function create(array $data): array
     {
         try {
-            // 1. get u_id from token
+            // 1. get logged in user id from token
             $userId = Auth::id();
 
-            // 2. find customer by u_id
+            if (!$userId) {
+                return [
+                    'status'  => false,
+                    'message' => 'Unauthenticated.',
+                    'data'    => null,
+                ];
+            }
+
+            // 2. find customer connected to this user
             $customer = Customer::where('u_id', $userId)->first();
 
             if (!$customer) {
                 return [
-                    'status' => false,
+                    'status'  => false,
                     'message' => 'Customer account not found.',
-                    'data' => null
+                    'data'    => null,
                 ];
             }
 
-            // 3. create booking
-            $bookings = Bookings::create([
-                'c_id'  => $customer->id,   // ← fetched from token
-                'd_id'  => $data['d_id'],
-                'date'  => $data['date'],
-                'time'  => $data['time'],
-                'status' => 'pending'
+            // 3. create booking (status always pending)
+            $booking = Booking::create([
+                'c_id'   => $customer->id,
+                'd_id'   => $data['d_id'],
+                'date'   => $data['date'],
+                'time'   => $data['time'],
+                'status' => 'pending',
             ]);
 
             return [
-                'status' => true,
+                'status'  => true,
                 'message' => 'Booking created successfully.',
-                'data' => $bookings
+                'data'    => $booking,
             ];
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             return [
-                'status' => false,
+                'status'  => false,
                 'message' => 'Failed to create booking.',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ];
         }
     }

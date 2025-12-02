@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\ApplicationRateController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\UpdatePhotoController;
 use App\Http\Controllers\Auth\DeletePhotoController;
+use App\Http\Controllers\Auth\UpdateProfileController;
 
 
 Route::post('/register', [RegisterController::class, 'register']);
@@ -17,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rate-app', [ApplicationRateController::class, 'submit']);
     Route::post('/update-photo', [UpdatePhotoController::class, 'update']);
     Route::delete('/delete-photo', [DeletePhotoController::class, 'delete']);
+    Route::post('/update-profile', [UpdateProfileController::class, 'update']);
 
 
 });

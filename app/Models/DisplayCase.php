@@ -20,4 +20,9 @@ class DisplayCase extends Model
     {
         return $this->belongsTo(Doctor::class, 'd_id');
     }
+
+    public function booking()
+{
+    return $this->belongsTo(Booking::class, 'booking_id');
+}
 }

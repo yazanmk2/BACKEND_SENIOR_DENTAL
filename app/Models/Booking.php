@@ -20,5 +20,8 @@ class Booking extends Model
     return $this->belongsTo(User::class, 'u_id');
 }
 
+public function displayCases() {
+    return $this->hasMany(DisplayCase::class, 'booking_id');
+}
 
 }

@@ -16,6 +16,8 @@ return new class extends Migration
     $table->foreignId('d_id')->constrained('doctors')->onDelete('cascade');
     $table->string('photo_before');
     $table->string('photo_after');
+    $table->unsignedBigInteger('booking_id')->nullable();
+    $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');
     $table->boolean('favorite_flag')->default(false);
     $table->timestamps();
 });

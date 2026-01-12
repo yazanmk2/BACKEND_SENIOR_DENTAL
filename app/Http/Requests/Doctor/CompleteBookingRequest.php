@@ -4,7 +4,7 @@ namespace App\Http\Requests\Doctor;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateBookingStatusRequest extends FormRequest
+class CompleteBookingRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,7 +15,7 @@ class UpdateBookingStatusRequest extends FormRequest
     {
         return [
             'booking_id' => 'required|integer|exists:bookings,id',
-            'status'     => 'required|in:approved,cancelled',
+            'note'       => 'nullable|string|max:1000',
         ];
     }
 
@@ -24,7 +24,6 @@ class UpdateBookingStatusRequest extends FormRequest
         return [
             'booking_id.required' => 'Booking ID is required.',
             'booking_id.exists'   => 'Booking not found.',
-            'status.in'           => 'Status must be approved or cancelled.',
         ];
     }
 }

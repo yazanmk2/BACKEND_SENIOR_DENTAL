@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
+use App\Http\Controllers\ai\DetectTeethController;
+
+
 
 // ✅ Load routes for each actor
 include __DIR__ . '/api/customer.php';
@@ -22,3 +25,9 @@ Route::get('/me', function () {
 Route::fallback(function () {
     return response()->json(['message' => 'Page not found.'], 404);
 });
+
+
+Route::middleware('auth:sanctum')->post(
+    '/ai/detect-teeth',
+    [DetectTeethController::class, 'detect']
+);

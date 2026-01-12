@@ -8,14 +8,16 @@ class Doctor extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'u_id',
-        'cv',
-        'specialization',
-        'previous_works',
-        'open_time',
-        'close_time',
-    ];
+protected $fillable = [
+    'u_id',
+    'cv',
+    'specialization',
+    'previous_works',
+    'open_time',
+    'close_time',
+    'average_rate',
+ ];
+
 
     public function user()
     {

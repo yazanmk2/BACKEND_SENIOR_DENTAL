@@ -8,18 +8,20 @@ use App\Models\Teeth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-
 
 class DetectTeethService
 {
-    private string $aiUrl = 'https://7d53c69ce90e.ngrok-free.app/detect_teeth';
+    /**
+     * Flask AI endpoint
+     */
+    private string $aiUrl = 'https://9a59498b23fb.ngrok-free.app/detect_teeth';
 
     public function handle($image): array
     {
         try {
+
             /* ===============================
-               1️⃣ Auth customer
+               1️⃣ Get authenticated customer
             =============================== */
             $user = Auth::user();
             $customer = Customer::where('u_id', $user->id)->first();
@@ -31,10 +33,13 @@ class DetectTeethService
                 ];
             }
 
+            /* ===============================
+               2️⃣ Base URL (dynamic)
+            =============================== */
             $baseUrl = request()->getSchemeAndHttpHost();
 
             /* ===============================
-               2️⃣ Store panorama locally
+               3️⃣ Store panorama image
             =============================== */
             $imageName = 'panorama_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
@@ -43,18 +48,6 @@ class DetectTeethService
                 $imageName,
                 'public'
             );
-
-            $fullImagePath = storage_path('app/public/' . $storedPath);
-
-            /* ===============================
-               3️⃣ RESIZE + COMPRESS (CRITICAL)
-            =============================== */
-            Image::make($fullImagePath)
-                ->resize(1024, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
-                ->save($fullImagePath, 85);
 
             $panoramaUrl = $baseUrl . '/storage/' . $storedPath;
 
@@ -73,7 +66,7 @@ class DetectTeethService
                 ->retry(2, 2000)
                 ->attach(
                     'image',
-                    file_get_contents($fullImagePath),
+                    file_get_contents(storage_path('app/public/' . $storedPath)),
                     $imageName
                 )
                 ->post($this->aiUrl);
@@ -96,10 +89,11 @@ class DetectTeethService
             }
 
             /* ===============================
-               6️⃣ AI base URL
+               6️⃣ Extract AI base URL
             =============================== */
             $aiBaseUrl =
-                parse_url($this->aiUrl, PHP_URL_SCHEME) . '://' .
+                parse_url($this->aiUrl, PHP_URL_SCHEME)
+                . '://' .
                 parse_url($this->aiUrl, PHP_URL_HOST);
 
             /* ===============================
@@ -109,37 +103,60 @@ class DetectTeethService
 
             foreach ($aiData['detections'] as $item) {
 
+                /* ---------- Parse label ---------- */
+                // Example: "4_6_Caries"
                 $labelParts = explode('_', $item['label']);
-                if (count($labelParts) < 2) continue;
+                if (count($labelParts) < 2) {
+                    continue;
+                }
 
-                $quarter = (int) $labelParts[0];
+                $quarter        = (int) $labelParts[0];
                 $toothInQuarter = (int) $labelParts[1];
-                $condition = $labelParts[2] ?? null;
+                $condition      = $labelParts[2] ?? null;
 
+                // Universal tooth number (1–32)
                 $toothNumber = (($quarter - 1) * 8) + $toothInQuarter;
 
-                /* === SAFE URL ENCODING === */
-                $relativePath = $item['crop_url'];
-                $encodedPath = implode('/', array_map('rawurlencode', explode('/', $relativePath)));
-                $cropFullUrl = $aiBaseUrl . $encodedPath;
+                /* ---------- SAFE crop URL ---------- */
+                $relativePath = ltrim($item['crop_url'], '/');
 
-                $cropContent = file_get_contents($cropFullUrl);
+                $encodedPath = implode(
+                    '/',
+                    array_map('rawurlencode', explode('/', $relativePath))
+                );
 
+                $cropFullUrl = $aiBaseUrl . '/' . $encodedPath;
+
+                /* ---------- Download crop safely ---------- */
+                $cropResponse = Http::timeout(30)
+                    ->retry(3, 1000)
+                    ->get($cropFullUrl);
+
+                // If crop missing → skip tooth safely
+                if (!$cropResponse->successful()) {
+                    continue;
+                }
+
+                $cropContent = $cropResponse->body();
+
+                /* ---------- Store crop in Laravel ---------- */
                 $cropName = 'tooth_' . $quarter . '_' . $toothInQuarter . '_' . uniqid() . '.png';
-                $cropStoragePath = 'teeth_crops/panorama_' . $panorama->id . '/' . $cropName;
+
+                $cropStoragePath =
+                    'teeth_crops/panorama_' . $panorama->id . '/' . $cropName;
 
                 Storage::disk('public')->put($cropStoragePath, $cropContent);
 
                 $cropPublicUrl = $baseUrl . '/storage/' . $cropStoragePath;
 
+                /* ---------- Save tooth ---------- */
                 $tooth = Teeth::create([
                     'p_id' => $panorama->id,
                     'name' => "{$quarter}_{$toothInQuarter}",
                     'photo_panorama_generated' => $cropPublicUrl,
                     'photo_icon' => null,
                     'descripe' => $condition,
-                    'number' => $toothNumber,
-                    'confidence' => $item['confidence'],
+                    'number' => $toothNumber
                 ]);
 
                 $storedTeeth[] = [
@@ -147,14 +164,13 @@ class DetectTeethService
                     'name' => $tooth->name,
                     'number' => $tooth->number,
                     'condition' => $tooth->descripe,
-                    'confidence' => $tooth->confidence,
                     'box' => $item['box'],
                     'photo_panorama_generated' => $cropPublicUrl
                 ];
             }
 
             /* ===============================
-               8️⃣ Response
+               8️⃣ Final response
             =============================== */
             return [
                 'status' => true,
@@ -168,6 +184,7 @@ class DetectTeethService
             ];
 
         } catch (\Throwable $e) {
+
             return [
                 'status' => false,
                 'message' => 'Unexpected error occurred.',

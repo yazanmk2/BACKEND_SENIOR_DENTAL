@@ -10,6 +10,9 @@ use App\Http\Controllers\Doctor\UpdateBookingStatusController;
 use App\Http\Controllers\Doctor\CompleteBookingController;
 use App\Http\Controllers\doctor\PanoramaTeethController;
 use App\Http\Controllers\doctor\TodayApprovedBookingsController;
+use App\Http\Controllers\Doctor\UpdateToothController;
+use App\Http\Controllers\Doctor\DeleteToothController;
+use App\Http\Controllers\Doctor\StoreToothController;
 
 
 
@@ -27,6 +30,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/complete', [CompleteBookingController::class, 'complete']);
     Route::post('/panorama-teeth', [PanoramaTeethController::class, 'show']);
     Route::get('/today-approved', [TodayApprovedBookingsController::class, 'index']);
+    Route::post('/teeth/update', [UpdateToothController::class, 'update']);
+    Route::delete('/teeth/delete', [DeleteToothController::class, '__invoke'] );
+    Route::post('/teeth/store', [StoreToothController::class,'__invoke']);
 
 
 

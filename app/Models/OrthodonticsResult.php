@@ -5,18 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Teeth extends Model
+class OrthodonticsResult extends Model
 {
     use HasFactory;
 
-    protected $table = 'teeth';
-
     protected $fillable = [
         'p_id',
-        'name',
-        'photo_panorama_generated',
-        'descripe',
-        'number',
+        'upper',
+        'lower',
+        'final',
     ];
 
     public function panorama()

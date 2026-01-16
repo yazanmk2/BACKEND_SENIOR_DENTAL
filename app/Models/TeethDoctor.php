@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Teeth extends Model
+class TeethDoctor extends Model
 {
     use HasFactory;
 
-    protected $table = 'teeth';
+    protected $table = 'teeth_doctor';
 
     protected $fillable = [
         'p_id',
@@ -19,8 +19,8 @@ class Teeth extends Model
         'number',
     ];
 
-    public function panorama()
+    public function panoramaDoctor()
     {
-        return $this->belongsTo(PanoramaPhoto::class, 'p_id');
+        return $this->belongsTo(PanoramaPhotoDoctor::class, 'p_id');
     }
 }

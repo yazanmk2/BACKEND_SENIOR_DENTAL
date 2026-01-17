@@ -29,6 +29,12 @@ jobs:
             echo "=== Enabling maintenance mode ==="
             php artisan down --retry=60 || true
 
+            echo "=== Clearing old caches ==="
+            php artisan route:clear || true
+            php artisan config:clear || true
+            php artisan view:clear || true
+            php artisan cache:clear || true
+
             echo "=== Pulling latest code ==="
             git fetch origin main
             git reset --hard origin/main

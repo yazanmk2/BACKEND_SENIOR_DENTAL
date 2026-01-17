@@ -1,0 +1,85 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            echo "======================================"
+            echo "Starting Laravel Backend Deployment"
+            echo "======================================"
+
+            cd /opt/senior-dental-backend
+
+            echo "=== Enabling maintenance mode ==="
+            php artisan down --retry=60 || true
+
+            echo "=== Pulling latest code ==="
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== Installing dependencies ==="
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "=== Running migrations ==="
+            php artisan migrate --force
+
+            echo "=== Clearing and caching config ==="
+            php artisan config:clear
+            php artisan config:cache
+
+            echo "=== Caching routes ==="
+            php artisan route:cache
+
+            echo "=== Caching views ==="
+            php artisan view:cache
+
+            echo "=== Restarting PHP-FPM ==="
+            sudo systemctl restart php8.2-fpm
+
+            echo "=== Restarting queue workers ==="
+            php artisan queue:restart || true
+
+            echo "=== Disabling maintenance mode ==="
+            php artisan up
+
+            echo "=== Health check ==="
+            sleep 5
+            for i in {1..6}; do
+              if curl -sf http://localhost/api/health > /dev/null 2>&1; then
+                echo "Health check passed!"
+                curl -s http://localhost/api/health | python3 -m json.tool || true
+                break
+              fi
+              if [ $i -eq 6 ]; then
+                echo "Health check failed after 6 attempts"
+                php artisan down --retry=60 || true
+                exit 1
+              fi
+              echo "Waiting for service... (attempt $i/6)"
+              sleep 5
+            done
+
+            echo "======================================"
+            echo "Deployment Complete!"
+            echo "======================================"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Check the logs above for details."

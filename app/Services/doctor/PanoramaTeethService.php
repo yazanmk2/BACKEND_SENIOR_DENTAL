@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\doctor;
+namespace App\Services\Doctor;
 
 use App\Models\Customer;
 use App\Models\PanoramaPhoto;

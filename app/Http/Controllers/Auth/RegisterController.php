@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Exception;
+use OpenApi\Attributes as OA;
 
 class RegisterController extends Controller
 {
@@ -19,10 +20,44 @@ class RegisterController extends Controller
         $this->registerService = $registerService;
     }
 
+    #[OA\Post(
+        path: "/v1/register",
+        summary: "User Registration",
+        description: "Register a new user (customer or doctor)",
+        tags: ["Auth"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["name", "email", "password", "password_confirmation", "role"],
+                properties: [
+                    new OA\Property(property: "name", type: "string", example: "John Doe"),
+                    new OA\Property(property: "email", type: "string", format: "email", example: "john@example.com"),
+                    new OA\Property(property: "password", type: "string", format: "password", example: "password123"),
+                    new OA\Property(property: "password_confirmation", type: "string", format: "password", example: "password123"),
+                    new OA\Property(property: "role", type: "string", enum: ["customer", "doctor"], example: "customer")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Registration successful",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "status", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Registration successful"),
+                        new OA\Property(property: "user", type: "object"),
+                        new OA\Property(property: "token", type: "string", example: "1|abc123...")
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation failed"),
+            new OA\Response(response: 500, description: "Server error")
+        ]
+    )]
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            // ✅ Try registration process
             $result = $this->registerService->register($request->validated());
 
             return response()->json([
@@ -33,7 +68,6 @@ class RegisterController extends Controller
             ], 201);
 
         } catch (ValidationException $e) {
-            // ❌ Handle validation errors (just in case)
             return response()->json([
                 'status' => false,
                 'message' => 'Validation failed',
@@ -41,7 +75,6 @@ class RegisterController extends Controller
             ], 422);
 
         } catch (QueryException $e) {
-            // ❌ Handle database errors
             return response()->json([
                 'status' => false,
                 'message' => 'Database error',
@@ -49,7 +82,6 @@ class RegisterController extends Controller
             ], 500);
 
         } catch (Exception $e) {
-            // ❌ Handle all other errors
             return response()->json([
                 'status' => false,
                 'message' => 'Something went wrong',

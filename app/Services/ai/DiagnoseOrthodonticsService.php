@@ -11,10 +11,14 @@ use Throwable;
 
 class DiagnoseOrthodonticsService
 {
-    /**
-     * Flask AI endpoint
-     */
-    private string $aiUrl = 'https://eb1f76b7cc0c.ngrok-free.app/diagnose_ortho';
+    private string $aiUrl;
+    private int $timeout;
+
+    public function __construct()
+    {
+        $this->aiUrl = config('services.ai.orthodontics_url');
+        $this->timeout = config('services.ai.timeout', 180);
+    }
 
     public function handle($image): array
     {
@@ -58,7 +62,7 @@ class DiagnoseOrthodonticsService
             /* ===============================
                4️⃣ Send image to Flask AI
             =============================== */
-            $response = Http::timeout(180)
+            $response = Http::timeout($this->timeout)
                 ->retry(2, 2000)
                 ->attach(
                     'image',

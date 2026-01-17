@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\customer;
+namespace App\Services\Customer;
 
 use App\Models\Booking;
 use App\Models\Customer;

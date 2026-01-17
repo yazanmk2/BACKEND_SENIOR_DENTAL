@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Ai;
+namespace App\Http\Requests\Doctor;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DetectTeethRequest extends FormRequest
+class DeleteTeethDoctorRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class DetectTeethRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:10240'
+            'id' => 'required|integer|exists:teeth_doctor,id',
         ];
     }
 }

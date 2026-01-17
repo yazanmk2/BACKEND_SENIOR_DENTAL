@@ -35,4 +35,34 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | AI Chatbot Service
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the AI chatbot microservice that provides RAG-based
+    | dental FAQ responses. This service runs on localhost and should not
+    | be exposed to the internet.
+    |
+    */
+    'chatbot' => [
+        'url' => env('CHATBOT_SERVICE_URL', 'http://localhost:8001'),
+        'timeout' => env('CHATBOT_TIMEOUT', 60),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Teeth Detection AI Service
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the teeth detection AI service (Flask).
+    | Should be moved from hardcoded URL in service classes.
+    |
+    */
+    'ai' => [
+        'teeth_detection_url' => env('AI_TEETH_DETECTION_URL', 'http://localhost:5000/detect_teeth'),
+        'orthodontics_url' => env('AI_ORTHODONTICS_URL', 'http://localhost:5000/diagnose_ortho'),
+        'timeout' => env('AI_SERVICE_TIMEOUT', 180),
+    ],
+
 ];

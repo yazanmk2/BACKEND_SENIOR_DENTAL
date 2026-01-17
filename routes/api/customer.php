@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\customer\CustomerInfoController;
-use App\Http\Controllers\customer\DisplayCaseController;
-use App\Http\Controllers\customer\TeethController;
-use App\Http\Controllers\customer\GetDoctorsController;
-use App\Http\Controllers\customer\BookingByStatusController;
-use App\Http\Controllers\customer\CreateBookingController;
-use App\Http\Controllers\customer\DeleteBookingController;
+use App\Http\Controllers\Customer\CustomerInfoController;
+use App\Http\Controllers\Customer\DisplayCaseController;
+use App\Http\Controllers\Customer\TeethController;
+use App\Http\Controllers\Customer\GetDoctorsController;
+use App\Http\Controllers\Customer\BookingByStatusController;
+use App\Http\Controllers\Customer\CreateBookingController;
+use App\Http\Controllers\Customer\DeleteBookingController;
 
 
 

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\customer;
+namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Services\customer\DisplayCaseService;
+use App\Services\Customer\DisplayCaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use OpenApi\Attributes as OA;
 
 class DisplayCaseController extends Controller
 {
@@ -18,10 +19,31 @@ class DisplayCaseController extends Controller
         $this->service = $service;
     }
 
+    #[OA\Get(
+        path: "/v1/customer/favorite-cases",
+        summary: "Get Favorite Display Cases",
+        description: "Retrieve favorite display cases for the customer",
+        tags: ["Customer"],
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Favorite display cases retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "status", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string"),
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: "Unauthorized"),
+            new OA\Response(response: 500, description: "Server error")
+        ]
+    )]
     public function getFavoriteCases(): JsonResponse
     {
         try {
-            // Main Logic
             $cases = $this->service->getFavoriteCases();
 
             return response()->json([
@@ -31,8 +53,6 @@ class DisplayCaseController extends Controller
             ], 200);
 
         } catch (QueryException $e) {
-
-            // Database-level error
             Log::error("Database error in getFavoriteCases: " . $e->getMessage());
 
             return response()->json([
@@ -42,8 +62,6 @@ class DisplayCaseController extends Controller
             ], 500);
 
         } catch (Exception $e) {
-
-            // Any unexpected error
             Log::error("Unexpected error in getFavoriteCases: " . $e->getMessage());
 
             return response()->json([

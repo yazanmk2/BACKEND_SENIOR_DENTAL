@@ -13,6 +13,10 @@ use App\Http\Controllers\doctor\TodayApprovedBookingsController;
 use App\Http\Controllers\Doctor\UpdateToothController;
 use App\Http\Controllers\Doctor\DeleteToothController;
 use App\Http\Controllers\Doctor\StoreToothController;
+use App\Http\Controllers\Doctor\GetDoctorPanoramasController;
+use App\Http\Controllers\Doctor\UpdateTeethDoctorController;
+use App\Http\Controllers\Doctor\TeethDoctorController;
+use App\Http\Controllers\Doctor\CreateTeethDoctorController;
 
 
 
@@ -33,9 +37,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teeth/update', [UpdateToothController::class, 'update']);
     Route::delete('/teeth/delete', [DeleteToothController::class, '__invoke'] );
     Route::post('/teeth/store', [StoreToothController::class,'__invoke']);
-
-
-
+    Route::get('/getpanoramasteeth', [GetDoctorPanoramasController::class, '__invoke']);
+    Route::put('/teeth/update-descripe', [UpdateTeethDoctorController::class, '__invoke']);
+    Route::delete('/delete/teeth', [TeethDoctorController::class, 'delete']);
+    Route::post('/create_teeth-doctor',[CreateTeethDoctorController::class, 'store']
+    );
 });
 
 });

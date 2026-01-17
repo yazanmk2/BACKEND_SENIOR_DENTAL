@@ -14,7 +14,7 @@ class DetectTeethService
     /**
      * Flask AI endpoint
      */
-    private string $aiUrl = 'https://9a59498b23fb.ngrok-free.app/detect_teeth';
+    private string $aiUrl = 'https://eb1f76b7cc0c.ngrok-free.app/detect_teeth';
 
     public function handle($image): array
     {

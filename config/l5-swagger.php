@@ -11,9 +11,8 @@ return [
             'routes' => [
                 /*
                  * Route for accessing api documentation interface
-                 * Disabled - using unified documentation at /documentation instead
                  */
-                'api' => null,
+                'api' => 'api/documentation',
             ],
             'paths' => [
                 /*

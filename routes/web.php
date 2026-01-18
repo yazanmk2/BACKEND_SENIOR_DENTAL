@@ -6,7 +6,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Unified API Documentation
+// Redirect to API Documentation
 Route::get('/documentation', function () {
-    return view('api-docs');
+    return redirect('/api/documentation');
 })->name('api.docs.unified');

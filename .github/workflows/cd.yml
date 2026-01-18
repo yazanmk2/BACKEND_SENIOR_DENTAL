@@ -19,14 +19,10 @@ jobs:
     steps:
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
-        env:
-          AI_TEETH_URL: ${{ secrets.AI_TEETH_DETECTION_URL }}
-          AI_ORTHO_URL: ${{ secrets.AI_ORTHODONTICS_URL }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: AI_TEETH_URL,AI_ORTHO_URL
           script: |
             set -e
 
@@ -48,16 +44,6 @@ jobs:
             echo "=== Pulling latest code ==="
             git fetch origin main
             git reset --hard origin/main
-
-            echo "=== Updating AI service URLs ==="
-            if [ -n "$AI_TEETH_URL" ]; then
-              sed -i "s|^AI_TEETH_DETECTION_URL=.*|AI_TEETH_DETECTION_URL=$AI_TEETH_URL|" .env
-              echo "Updated AI_TEETH_DETECTION_URL"
-            fi
-            if [ -n "$AI_ORTHO_URL" ]; then
-              sed -i "s|^AI_ORTHODONTICS_URL=.*|AI_ORTHODONTICS_URL=$AI_ORTHO_URL|" .env
-              echo "Updated AI_ORTHODONTICS_URL"
-            fi
 
             echo "=== Installing dependencies ==="
             composer install --no-dev --optimize-autoloader --no-interaction

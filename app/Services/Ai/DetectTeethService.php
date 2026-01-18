@@ -1,5 +1,6 @@
 <?php
-namespace App\Services\ai;
+
+namespace App\Services\Ai;
 
 use App\Models\Customer;
 use App\Models\PanoramaPhoto;

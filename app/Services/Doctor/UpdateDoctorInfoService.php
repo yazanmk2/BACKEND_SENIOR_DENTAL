@@ -40,6 +40,12 @@ class UpdateDoctorInfoService
 
             $doctor->save();
 
+            // Update user address if provided (for location/coordinates)
+            if (isset($data['address'])) {
+                $user->address = $data['address'];
+                $user->save();
+            }
+
             return [
                 'status' => true,
                 'message' => 'Doctor information saved successfully.',

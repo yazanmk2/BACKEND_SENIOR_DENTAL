@@ -19,6 +19,7 @@ class UpdateDoctorInfoRequest extends FormRequest
             'previous_works' => 'nullable|string',
             'open_time'      => 'required|date_format:H:i',
             'close_time'     => 'required|date_format:H:i|after:open_time',
+            'address'        => 'nullable|string|max:500', // Format: "lat,lng|optional info"
         ];
     }
 

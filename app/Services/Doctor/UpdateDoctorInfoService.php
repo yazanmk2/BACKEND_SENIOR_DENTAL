@@ -20,8 +20,8 @@ class UpdateDoctorInfoService
                 ];
             }
 
-            // Find or create doctor record
-            $doctor = Doctor::firstOrCreate(
+            // Find or create doctor record (firstOrNew doesn't save until we call save())
+            $doctor = Doctor::firstOrNew(
                 ['u_id' => $user->id],
                 ['average_rate' => 0]
             );

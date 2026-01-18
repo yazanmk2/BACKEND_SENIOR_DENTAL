@@ -12,14 +12,7 @@ use Throwable;
 
 class DoctorDetectTeethService
 {
-    private string $aiUrl;
-    private int $timeout;
-
-    public function __construct()
-    {
-        $this->aiUrl = config('services.ai.teeth_detection_url');
-        $this->timeout = config('services.ai.timeout', 180);
-    }
+    private string $aiUrl = 'https://d9260da76906.ngrok-free.app/detect_teeth';
 
     public function handle($image, string $customerName): array
     {
@@ -64,8 +57,7 @@ class DoctorDetectTeethService
             /* ===============================
                4️⃣ Send to Flask AI
             =============================== */
-            $response = Http::timeout($this->timeout)
-                ->retry(2, 2000)
+            $response = Http::timeout(180)
                 ->attach(
                     'image',
                     file_get_contents(storage_path('app/public/' . $storedPath)),
@@ -110,26 +102,13 @@ class DoctorDetectTeethService
 
                 $toothNumber = (($quarter - 1) * 8) + $toothInQuarter;
 
-                /* === Download crop safely === */
-                $relativePath = ltrim($item['crop_url'], '/');
-
+                /* === Download crop === */
                 $encodedPath = implode(
                     '/',
-                    array_map('rawurlencode', explode('/', $relativePath))
+                    array_map('rawurlencode', explode('/', $item['crop_url']))
                 );
 
-                $cropFullUrl = $aiBaseUrl . '/' . $encodedPath;
-
-                $cropResponse = Http::timeout(30)
-                    ->retry(3, 1000)
-                    ->get($cropFullUrl);
-
-                // If crop missing → skip tooth safely
-                if (!$cropResponse->successful()) {
-                    continue;
-                }
-
-                $cropContent = $cropResponse->body();
+                $cropContent = file_get_contents($aiBaseUrl . $encodedPath);
 
                 $cropName = 'tooth_' . $quarter . '_' . $toothInQuarter . '_' . uniqid() . '.png';
                 $cropPath = 'teeth_doctors/panorama_' . $panorama->id . '/' . $cropName;

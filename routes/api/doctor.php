@@ -18,6 +18,8 @@ use App\Http\Controllers\Doctor\GetDoctorPanoramasController;
 use App\Http\Controllers\Doctor\CreateTeethDoctorController;
 use App\Http\Controllers\Doctor\UpdateTeethDoctorController;
 use App\Http\Controllers\Doctor\TeethDoctorController;
+use App\Http\Controllers\Doctor\GetTeethByPanoramaController;
+
 
 Route::prefix('doctor')->group(function (): void {
 
@@ -35,6 +37,7 @@ Route::prefix('doctor')->group(function (): void {
         Route::post('/teeth/update', [UpdateToothController::class, 'update']);
         Route::delete('/teeth/delete', [DeleteToothController::class, '__invoke']);
         Route::post('/teeth/store', [StoreToothController::class, '__invoke']);
+        Route::post('/teeth/by-panorama', [GetTeethByPanoramaController::class, 'index']);
 
         // Doctor Panoramas & Teeth (AI-generated)
         Route::get('/panoramas', GetDoctorPanoramasController::class);

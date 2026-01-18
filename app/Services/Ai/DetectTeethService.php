@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Services\Ai;
+namespace App\Services\ai;
 
 use App\Models\Customer;
 use App\Models\PanoramaPhoto;
@@ -11,14 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class DetectTeethService
 {
-    private string $aiUrl;
-    private int $timeout;
-
-    public function __construct()
-    {
-        $this->aiUrl = config('services.ai.teeth_detection_url');
-        $this->timeout = config('services.ai.timeout', 180);
-    }
+    /**
+     * Flask AI endpoint
+     */
+    private string $aiUrl = 'https://d9260da76906.ngrok-free.app/detect_teeth';
 
     public function handle($image): array
     {
@@ -63,10 +58,7 @@ class DetectTeethService
                 'photo' => $panoramaUrl
             ]);
 
-            /* ===============================
-               5️⃣ Send image to Flask AI
-            =============================== */
-            $response = Http::timeout($this->timeout)
+            $response = Http::timeout(180)
                 ->retry(2, 2000)
                 ->attach(
                     'image',

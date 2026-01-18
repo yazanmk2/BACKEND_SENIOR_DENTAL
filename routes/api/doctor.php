@@ -8,8 +8,8 @@ use App\Http\Controllers\Doctor\DeleteDisplayCaseController;
 use App\Http\Controllers\Doctor\GetBookingsByStatusController;
 use App\Http\Controllers\Doctor\UpdateBookingStatusController;
 use App\Http\Controllers\Doctor\CompleteBookingController;
-use App\Http\Controllers\doctor\PanoramaTeethController;
-use App\Http\Controllers\doctor\TodayApprovedBookingsController;
+use App\Http\Controllers\Doctor\PanoramaTeethController;
+use App\Http\Controllers\Doctor\TodayApprovedBookingsController;
 use App\Http\Controllers\Doctor\UpdateToothController;
 use App\Http\Controllers\Doctor\DeleteToothController;
 use App\Http\Controllers\Doctor\StoreToothController;
@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teeth/store', [StoreToothController::class,'__invoke']);
     Route::get('/getpanoramasteeth', [GetDoctorPanoramasController::class, '__invoke']);
     Route::put('/teeth/update-descripe', [UpdateTeethDoctorController::class, '__invoke']);
-    Route::delete('/delete/teeth', [TeethDoctorController::class, 'delete']);
+    Route::delete('/delete/teeth', [TeethDoctorController::class, '__invoke']);
     Route::post('/create_teeth-doctor',[CreateTeethDoctorController::class, 'store']
     );
             Route::post('/teeth/by-panorama', [GetTeethByPanoramaController::class, 'index']);

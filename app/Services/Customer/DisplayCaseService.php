@@ -20,7 +20,7 @@ class DisplayCaseService
                 'doctors.average_rate'
             )
             ->where('display_cases.favorite_flag', 1)
-            ->where('doctors.average_rate', '>', 3)
+            ->where('doctors.average_rate', '>', -1)
             ->get();
     }
 }

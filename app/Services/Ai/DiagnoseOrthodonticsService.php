@@ -14,7 +14,7 @@ class DiagnoseOrthodonticsService
     /**
      * Flask AI endpoint
      */
-    private string $aiUrl = 'https://d4f9637a34da.ngrok-free.app/diagnose_ortho';
+    private string $aiUrl = 'https://6165eec04a55.ngrok-free.app/diagnose_ortho';
 
     public function handle($image): array
     {

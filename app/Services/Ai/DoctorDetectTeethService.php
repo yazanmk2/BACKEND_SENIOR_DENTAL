@@ -12,7 +12,7 @@ use Throwable;
 
 class DoctorDetectTeethService
 {
-    private string $aiUrl = 'https://d4f9637a34da.ngrok-free.app/detect_teeth';
+    private string $aiUrl = 'https://6165eec04a55.ngrok-free.app/detect_teeth';
 
     public function handle($image, string $customerName): array
     {
